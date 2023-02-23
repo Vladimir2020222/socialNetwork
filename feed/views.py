@@ -52,6 +52,10 @@ class UpdatePostView(UpdateView):
         kwargs['request'] = self.request
         return kwargs
 
+    def dispatch(self, request, *args, **kwargs):
+        self._verify_author()
+        super().dispatch(request, *args, **kwargs)
+
 
 class PostDetailView(DetailView):
     model = Post
