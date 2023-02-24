@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.urls import reverse_lazy
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
+    'templatetags.apps.TemplatetagsConfig',
     'feed.apps.FeedConfig'
 ]
 
@@ -65,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'socialNetwork.context_processors.main_menu'
             ],
         },
     },
@@ -138,3 +142,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# feed
+
+MAIN_MENU_LINKS = [
+    (reverse_lazy('main'), 'feed'),
+    (reverse_lazy('post_create'), 'create_post'),
+    (reverse_lazy('profile'), 'profile')
+]
+

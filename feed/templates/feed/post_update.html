@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>updating post</title>
-</head>
-<body>
-<form action="{{ request.path }}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">update</button>
-</form>
-</body>
-</html>
+{% extends 'feed/base.html' %}
+
+{% block title %}
+    update post
+{% endblock %}
+
+{% block content %}
+    <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">update</button><br>
+    </form>
+    <button><a href="{{ request.path }}">delete post</a></button>
+{% endblock %}

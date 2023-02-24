@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>create post</title>
-</head>
-<body>
-<form action="{% url 'post_create' %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">submit</button>
-</form>
-</body>
-</html>
+{% extends 'feed/base.html' %}
+
+{% block title %}
+    create post
+{% endblock %}
+
+{% block content %}
+    <form action="{% url 'post_create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">submit</button>
+    </form>
+{% endblock %}

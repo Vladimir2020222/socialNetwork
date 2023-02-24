@@ -35,6 +35,8 @@ class Post(LikeablePermission):
     def get_absolute_url(self):
         return reverse('post', kwargs={'pk': self.pk})
 
+    __html__ = (lambda self: str(self.title) + str(self.author))
+
 
 class Comment(LikeablePermission):
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING,

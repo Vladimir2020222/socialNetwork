@@ -1,13 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>SocialNetwork</title>
-</head>
-<body>
-{{ user }}
-{% for post in posts %}
-    <a href="{{ post.get_absolute_url }}">post</a>
-{% endfor %}
-</body>
-</html>
+{% extends 'feed/base.html' %}
+{% load static %}
+{% load templatetags %}
+
+
+{% block title %}
+    social Network
+{% endblock %}
+
+{% block head %}
+    <script src="{% static 'feed/js/main.js' %}"></script>
+    <link href="{% static 'feed/css/feed.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+    {% for post in posts %}
+        <div class="post">
+            <h3>{{ post.author }}</h3>
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.text }}</p>
+            <div id="{{ post.pk }}_img"
+                 onmouseover="show_img_change_arrows({{ post.pk }})"
+                 onmouseleave="hide_img_change_arrows({{ post.pk }})">
+                {% for i, image in post.images.all|enumerate %}
+                    <img id="{{ post.pk }}_{{ i }}" src="{{ image.img.url }}" width="600" height="600" alt="image"
+                         {% if i > 0 %}hidden{% endif %}><br>
+                {% endfor %}
+                <img id="{{ post.pk }}_last_img" src="{% static 'feed/img/last_image.svg' %}"
+                     onclick="last_img({{ post.pk }})" alt="last" class="last-image-arrow">
+                <img id="{{ post.pk }}_next_img" src="{% static 'feed/img/next_image.svg' %}"
+                     onclick="next_img({{ post.pk }})" alt="next" class="next-image-arrow">
+            </div>
+            <p>likes: {{ post.likes.count }} dislikes: {{ post.dislikes.count }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

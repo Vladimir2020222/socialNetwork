@@ -17,7 +17,7 @@ class CreatePostFrom(forms.ModelForm):
     def _save_m2m(self):
         super()._save_m2m()
         Image.objects.bulk_create(
-            [Image(post=self.instance, img=img) for img in self.request.FILES.getlist('images')]
+            [Image(post=self.instance, img=img) for img in reversed(self.request.FILES.getlist('images'))]
         )
 
 

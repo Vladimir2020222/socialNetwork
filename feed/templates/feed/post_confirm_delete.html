@@ -1,0 +1,11 @@
+{% extends 'feed/base.html' %}
+
+{% block title %}
+    confirm deletion
+{% endblock %}
+
+{% block content %}
+<form action="{{ request.path }}" method="post">
+    <button type="submit">confirm deletion</button>
+</form>
+{% endblock %}

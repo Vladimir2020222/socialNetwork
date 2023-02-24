@@ -1,18 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>post</title>
-</head>
-<body>
-<h1>{{ post.title }} by {{ post.author }}</h1>
-<p>{{ post.text }}</p>
-<h5>has {{ post.likes.count }} likes and {{ post.dislikes.count }} dislikes.
-    Published in {{ post.date_published }} and updated in {{ post.data_update }}</h5>
-{% for image in post.images.all %}
-    {{ image.img }}<br>
-{% endfor %}
+{% extends 'feed/base.html' %}
+{% load templatetags %}
+{% load static %}
 
-<a href="{% url 'post_update' post.pk %}">update</a>
-</body>
-</html>
+{% block title %}
+    post info
+{% endblock %}
+
+{% block content %}
+    <h1>{{ post.title }} by {{ post.author }}</h1>
+    <p>{{ post.text }}</p>
+    <h5>has {{ post.likes.count }} likes and {{ post.dislikes.count }} dislikes.
+        Published in {{ post.date_published }} and updated in {{ post.data_update }}</h5>
+    {% for i, image in post.images.all|enumerate %}
+        <img id="{{ post.pk }}_{{ i }}" src="{{ image.img.url }}" alt="image" width="600" height="600"><br>
+    {% endfor %}
+
+    <a href="{% url 'post_update' post.pk %}">update</a>
+{% endblock %}

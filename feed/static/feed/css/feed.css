@@ -1,0 +1,14 @@
+.next-image-arrow, .last-image-arrow {
+     opacity: 0;
+}
+
+.next-image-arrow {
+    position: relative;
+    bottom: 300px;
+    left: 500px;
+}
+
+.last-image-arrow {
+    position: relative;
+    bottom: 300px;
+}
