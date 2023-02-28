@@ -1,0 +1,8 @@
+{% load templatetags %}
+
+<h3 style="margin-left: {{ comment.level|mul:20 }}px;">{{ comment.author }}</h3>
+<p style="margin-left: {{ comment.level|mul:20|add:20 }}px;">{{ comment.text }}</p>
+
+{% for answer in comment.answers.all %}
+    {{ answer.render }}
+{% endfor %}

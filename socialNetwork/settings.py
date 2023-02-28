@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
     'templatetags.apps.TemplatetagsConfig',
-    'feed.apps.FeedConfig'
+    'feed.apps.FeedConfig',
+    'app.apps.AppConfig',
 ]
 
 MIDDLEWARE = [
@@ -148,6 +149,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MAIN_MENU_LINKS = [
     (reverse_lazy('main'), 'feed'),
     (reverse_lazy('post_create'), 'create_post'),
-    (reverse_lazy('profile'), 'profile')
+    (reverse_lazy('profile'), 'profile'),
+    (reverse_lazy('login'), 'login'),
+    (reverse_lazy('logout'), 'logout')
 ]
 

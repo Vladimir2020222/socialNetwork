@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+<form action="{{ request.path }}" method="post" novalidate>
+    {% csrf_token %}
+    {{ first_form.as_p }}
+    <button type="submit">submit</button>
+</form>
+<form action="{{ request.path }}" method="post" novalidate>
+    {% csrf_token %}
+    {{ second_form.as_p }}
+    <button type="submit">submit</button>
+</form>
+</body>
+</html>

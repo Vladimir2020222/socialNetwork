@@ -41,31 +41,28 @@ function show_img_change_arrows(post_pk) {
     let show_next_arrow = document.getElementById(post_pk + '_' + (i + 1)) !== null
 
     if (show_last_arrow) {
-        let last_arrow = document.getElementById(post_pk + '_last_img')
-        last_arrow.style.opacity = '0.01';
+        let arrow = document.getElementById(post_pk + '_last_img')
+        arrow.style.opacity = '0.1';
 
-        let last_arrow_interval = setInterval(function () {
-            if (last_arrow.style.opacity === '0') {
-                clearInterval(last_arrow_interval)
-            }
-            last_arrow.style.opacity = String(Number(last_arrow.style.opacity) + 0.05)
+        let arrow_interval = setInterval(function () {
+            if (Number(arrow.style.opacity) <= 0) {clearInterval(arrow_interval)}
+            arrow.style.opacity = String(Number(arrow.style.opacity) + 0.05)
 
         }, 50)
-        setTimeout(function () {clearInterval(last_arrow_interval)}, 750)
+        setTimeout(function () {clearInterval(arrow_interval)}, 500)
     }
 
     if (show_next_arrow) {
-        let next_arrow = document.getElementById(post_pk + '_next_img')
-        next_arrow.style.opacity = '0.01';
+        let arrow = document.getElementById(post_pk + '_next_img')
+        arrow.style.opacity = '0.1';
 
-        let next_arrow_interval = setInterval(function () {
-            if (next_arrow.style.opacity === '0') {
-                clearInterval(next_arrow_interval)
-            }
-            next_arrow.style.opacity = String(Number(next_arrow.style.opacity) + 0.05)
+        let arrow_interval = setInterval(function () {
+            if (Number(arrow.style.opacity) <= 0) {clearInterval(arrow_interval)}
+            arrow.style.opacity = String(Number(arrow.style.opacity) + 0.05)
 
         }, 50)
-        setTimeout(function () {clearInterval(next_arrow_interval)}, 750)
+        setTimeout(function () {clearInterval(arrow_interval)}, 500)
+
     }
 }
 
@@ -74,7 +71,5 @@ function hide_img_change_arrows(post_pk) {
     let last_arrow = document.getElementById(post_pk + '_last_img')
     last_arrow.style.opacity = '0';
     next_arrow.style.opacity = '0';
-
-
-
 }
+

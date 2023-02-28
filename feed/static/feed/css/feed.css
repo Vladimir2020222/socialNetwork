@@ -12,3 +12,10 @@
     position: relative;
     bottom: 300px;
 }
+
+input.like-counter {
+    border: none;
+    background-color: rgba(0, 0, 0, 0);
+    color: inherit;
+    width: 30px;
+}

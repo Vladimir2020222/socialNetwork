@@ -1,5 +1,9 @@
 {% extends 'feed/base.html' %}
 
+{% block head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+{% endblock %}
+
 {% block title %}
     update post
 {% endblock %}
@@ -10,5 +14,6 @@
         {{ form.as_p }}
         <button type="submit">update</button><br>
     </form>
-    <button><a href="{{ request.path }}">delete post</a></button>
+    <button><a href="{% url 'post_delete' post.pk %}">delete</a></button>
 {% endblock %}
+
