@@ -14,7 +14,7 @@ body {
     background-color: rgba(0, 0, 0, 0);
     display: inline-block;
     position: absolute;
-    width: 600px;
+    width: 620px;
     left: 30%;
 }
 
@@ -33,12 +33,18 @@ body {
     transform: translateX(-20px);
 }
 
+#main-left-menu ul li {
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 8px;
+    width: 100px;
+}
+
 #main-left-menu ul li a {
-    margin: 10px;
-    padding: 10px;
+    padding: 0 10px 0 10px;
     text-decoration: none;
     color: #ddd;
-    border-radius: 8px;
+    display: block;
+    width: 100px;
 }
 
 #main-left-menu ul li:hover {
@@ -46,6 +52,13 @@ body {
     border-radius: 8px;
 }
 
-input {
-    background-color: #fff;
+.user-ava {
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    height: 50px;
+    width: 50px;
+}
+
+.user-name {
+    display: inline;
 }

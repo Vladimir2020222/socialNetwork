@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'templatetags.apps.TemplatetagsConfig',
     'feed.apps.FeedConfig',
-    'app.apps.AppConfig',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +66,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.csrf',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'socialNetwork.context_processors.main_menu'

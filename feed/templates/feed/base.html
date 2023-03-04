@@ -26,6 +26,29 @@
 {% block scripts %}
 
 {% endblock %}
+<script>
+    const csrf_token = "{{ csrf_token }}"
+    const urls = {
+        'like_post': "{% url 'like_post' %}",
+        'dislike_post': "{% url 'dislike_post' %}",
+        'unlike_post': "{% url 'unlike_post' %}",
+        'undislike_post': "{% url 'undislike_post' %}",
+        'like_comment': "{% url 'like_comment' %}",
+        'dislike_comment': "{% url 'dislike_comment' %}",
+        'unlike_comment': "{% url 'unlike_comment' %}",
+        'undislike_comment': "{% url 'undislike_comment' %}",
+        'send_comment': "{% url 'send_comment' %}",
+        'send_answer_to_comment': "{% url 'send_answer_to_comment' %}",
+        'get_post_comments': "{% url 'get_post_comments' %}"
+    }
 
+    const staticfiles = {
+        'inactive_like': "{% static 'feed/img/inactive_like.png' %}",
+        'active_like': "{% static 'feed/img/active_like.png' %}",
+        'inactive_dislike': "{% static 'feed/img/inactive_dislike.png' %}",
+        'active_dislike': "{% static 'feed/img/active_dislike.png' %}"
+
+    }
+</script>
 </body>
 </html>

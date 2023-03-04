@@ -1,8 +1,62 @@
+{% load static %}
 {% load templatetags %}
+{% load feed %}
 
-<h3 style="margin-left: {{ comment.level|mul:20 }}px;">{{ comment.author }}</h3>
-<p style="margin-left: {{ comment.level|mul:20|add:20 }}px;">{{ comment.text }}</p>
+<div onclick="hide_or_show_comment_answer_form({{ comment.pk }})" id="{{ comment.pk }}_comment" class="comment comment-level-{{ comment.level }}">
+    <a href="{{ comment.author.get_absolute_url }}">
+        <img class="user-ava" src="{{ comment.author.ava.url }}" alt="ava">
+    </a>
+    <h3 class="user-name">{{ comment.author }}</h3>
+    <p style="margin-left: {{ comment.level|mul:20|add:20 }}px;">{% if comment.text|length < 650 %}
+        {{ comment.text }}
+        {% else %}
+            <span onclick="hide_or_show_comment_text({{ comment.pk }})">
+                {{ comment.text|slice:':650' }}<span id="{{ comment.pk }}_comment_text_ellipsis">...</span><span id="{{ comment.pk }}_comment_hidden_text" hidden>{{ comment.text|slice:'650:' }}</span>
+            </span>
+        {% endif %}
+    </p>
+</div>
 
-{% for answer in comment.answers.all %}
-    {{ answer.render }}
-{% endfor %}
+<div class="comment-statistics comment-margin-level-{{ comment.level }}">
+    likes: <input class="like-counter" id="{{ comment.pk }}_comment_like_input" type="text"
+                  value="{{ comment.likes.count }}" readonly>
+    <div style="padding: 8px; display: inline-block" onclick="like_comment({{ comment.pk }})">
+        <img id="{{ comment.pk }}_comment_like_button" src="
+                    {% if comment|has_liked_by:user %}
+                        {% static 'feed/img/active_like.png' %}
+                    {% else %}
+                        {% static 'feed/img/inactive_like.png' %}
+                    {% endif %}" alt="like">
+    </div>
+
+    dislikes: <input class="like-counter" id="{{ comment.pk }}_comment_dislike_input" type="text"
+                     value="{{ comment.dislikes.count }}" readonly>
+    <div style="padding: 8px; display: inline-block" onclick="dislike_comment({{ comment.pk }})">
+        <img id="{{ comment.pk }}_comment_dislike_button" src="{% if comment|has_disliked_by:user %}
+                            {% static 'feed/img/active_dislike.png' %}
+                        {% else %}
+                            {% static 'feed/img/inactive_dislike.png' %}
+                        {% endif %}" alt="dislike">
+    </div>
+</div>
+
+<form id="{{ comment.pk }}_answer_form" method="post"
+      class="answer-form comment-margin-level-{{ comment.level }}" style="display: none">
+    {% csrf_token %}
+    {{ comment.answer_form }}
+    <img src="{% static 'feed/img/send_comment.png' %}" alt="send"
+         onclick="send_answer({{ comment.pk }}, {{ comment.post.pk }})">
+</form>
+
+{% if answers %}
+    <div class="comment-margin-level-{{ comment.level }}" style="color: #3ea6ff">
+        <div style="display: inline-block;" id="{{ comment.pk }}_hide_or_show_answers_text"
+                 onclick="hide_or_show_comment_answers({{ comment.pk }})">show answers</div>
+        <div style="display: inline-block;">({{ answers|length }})</div>
+    </div>
+    <div id="{{ comment.pk }}_comment_answers" hidden>
+        {% for answer in answers %}
+            {{ answer|render_with_request:request }}
+        {% endfor %}
+    </div>
+{% endif %}

@@ -1,0 +1,7 @@
+{% load templatetags %}
+{% load static %}
+{% load feed %}
+
+{% for comment in post.comments.first_level %}
+    {{ comment|render_with_request:request }}
+{% endfor %}

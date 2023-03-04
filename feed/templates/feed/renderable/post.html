@@ -1,0 +1,79 @@
+{% load static %}
+{% load templatetags %}
+{% load feed %}
+
+<div class="post" id="{{ post.pk }}_post">
+    {# main info #}
+    <a href="{{ post.author.get_absolute_url }}">
+        <img class="user-ava" src="{{ post.author.ava.url }}" alt="ava">
+    </a>
+    <h3 class="user-name">{{ post.author }}</h3>
+    <h2>{{ post.title }}</h2>
+    <p>
+        {% if post.text|length < 1000 %}
+            {{ post.text }}
+        {% else %}
+            <span onclick="hide_or_show_post_text({{ post.pk }})">
+                        {{ post.text|slice:':1000' }}<span id="{{ post.pk }}_text_ellipsis">...</span><span
+                    id="{{ post.pk }}_hidden_text" hidden>{{ post.text|slice:'1000:' }}</span>
+                    </span>
+        {% endif %}
+    </p>
+
+    {# image #}
+    <div id="{{ post.pk }}_img"
+         onmouseover="show_img_change_arrows({{ post.pk }})"
+         onmouseleave="hide_img_change_arrows({{ post.pk }})">
+        {% for i, image in post.images.all|enumerate %}
+            <img id="{{ post.pk }}_{{ i }}" src="{{ image.img.url }}" width="800" height="800" alt="image"
+                 {% if i > 0 %}hidden{% endif %}><br>
+        {% endfor %}
+        <img id="{{ post.pk }}_last_img" src="{% static 'feed/img/last_image.svg' %}"
+             onclick="last_img({{ post.pk }})" alt="last" class="last-image-arrow">
+        <img id="{{ post.pk }}_next_img" src="{% static 'feed/img/next_image.svg' %}"
+             onclick="next_img({{ post.pk }})" alt="next" class="next-image-arrow">
+    </div>
+
+    {# statistics #}
+    <div class="post-statistics">
+        likes: <input class="like-counter" id="{{ post.pk }}_like_input" type="text"
+                      value="{{ post.likes.count }}" readonly>
+        <div style="padding: 15px; display: inline-block" onclick="like_post({{ post.pk }})">
+            <img id="{{ post.pk }}_like_button" src="{% if post|has_liked_by:user %}
+                        {% static 'feed/img/active_like.png' %}
+                    {% else %}
+                        {% static 'feed/img/inactive_like.png' %}
+                    {% endif %}" alt="like">
+        </div>
+
+        dislikes: <input class="like-counter" id="{{ post.pk }}_dislike_input" type="text"
+                         value="{{ post.dislikes.count }}" readonly>
+        <div style="padding: 15px; display: inline-block" onclick="dislike_post({{ post.pk }})">
+            <img id="{{ post.pk }}_dislike_button" src="{% if post|has_disliked_by:user %}
+                            {% static 'feed/img/active_dislike.png' %}
+                        {% else %}
+                            {% static 'feed/img/inactive_dislike.png' %}
+                        {% endif %}" alt="dislike">
+        </div>
+    </div>
+
+    {# the form to send comment #}
+    <form id="{{ post.pk }}_comment_form" action="{% url 'main' %}" method="post">
+        {% csrf_token %}
+        {{ post.comment_form }}
+        <img src="{% static 'feed/img/send_comment.png' %}" alt="send"
+             onclick="send_comment({{ post.pk }})">
+    </form>
+
+    {# comments #}
+    <div id="{{ post.pk }}_comments">
+        {% for comment in post.comments.first_level %}
+            {{ comment|render_with_request:request }}
+        {% endfor %}
+    </div>
+
+    {# link to edit the post #}
+    {% if post.author == user or perms.feed.delete_post %}
+        <a href="{% url 'post_update' post.pk %}">change</a>
+    {% endif %}
+</div>

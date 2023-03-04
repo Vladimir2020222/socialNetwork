@@ -10,133 +10,13 @@
 
 {% block head %}
     <script src="{% static 'feed/js/main.js' %}"></script>
+    <script src="{% static 'feed/js/feed.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <link href="{% static 'feed/css/feed.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
     {% for post in posts %}
-        <div class="post">
-            <h3>{{ post.author }}</h3>
-            <h2>{{ post.title }}</h2>
-            <p>{{ post.text }}</p>
-
-            <div id="{{ post.pk }}_img"
-                 onmouseover="show_img_change_arrows({{ post.pk }})"
-                 onmouseleave="hide_img_change_arrows({{ post.pk }})">
-                {% for i, image in post.images.all|enumerate %}
-                    <img id="{{ post.pk }}_{{ i }}" src="{{ image.img.url }}" width="600" height="600" alt="image"
-                         {% if i > 0 %}hidden{% endif %}><br>
-                {% endfor %}
-                <img id="{{ post.pk }}_last_img" src="{% static 'feed/img/last_image.svg' %}"
-                     onclick="last_img({{ post.pk }})" alt="last" class="last-image-arrow">
-                <img id="{{ post.pk }}_next_img" src="{% static 'feed/img/next_image.svg' %}"
-                     onclick="next_img({{ post.pk }})" alt="next" class="next-image-arrow">
-            </div>
-
-            <p>likes: <input class="like-counter" id="{{ post.pk }}_like_input" type="text"
-                             value="{{ post.likes.count }}" readonly>
-            <img id="{{ post.pk }}_like_button" src="{% if post|has_liked_by:user %}
-                    {% static 'feed/img/active_like.png' %}
-                {% else %}
-                    {% static 'feed/img/inactive_like.png' %}
-                {% endif %}" alt="like" onclick="like_post({{ post.pk }})">
-
-            dislikes: <input class="like-counter" id="{{ post.pk }}_dislike_input" type="text"
-                             value="{{ post.dislikes.count }}" readonly>
-            <img id="{{ post.pk }}_dislike_button" src="{% if post|has_disliked_by:user %}
-                    {% static 'feed/img/active_dislike.png' %}
-                {% else %}
-                    {% static 'feed/img/inactive_dislike.png' %}
-                {% endif %}" alt="dislike" onclick="dislike_post({{ post.pk }})">
-            </p>
-
-            <form id="{{ post.pk }}_comment_form" action="{% url 'main' %}" method="post">
-                {% csrf_token %}
-                {{ post.comment_form }}
-                <button id="{{ post.pk }}_submit_comment_button" type="submit" hidden></button>
-                <img src="{% static 'feed/img/send_comment.png' %}" alt="send"
-                     onclick="send_comment({{ post.pk }})">
-            </form>
-
-            {% for comment in post.comments.first_level %}
-                {{ comment.render }}
-            {% endfor %}
-            {% if post.author == user or perms.feed.delete_post %}
-                <a href="{% url 'post_update' post.pk %}">change</a>
-            {% endif %}
-        </div>
+        {{ post|render_with_request:request }}
     {% endfor %}
 {% endblock %}
-
-{% block scripts %}
-    <script>
-        function get_ajax_data(post_pk) {
-            return {
-                    'type': 'GET',
-                    'data': {'post_pk': post_pk}
-                }
-        }
-
-        function like_post(post_pk) {
-            if (document.getElementById(post_pk + '_like_button').src.endsWith("{% static 'feed/img/inactive_like.png' %}")) {
-                if (document.getElementById(post_pk + '_dislike_button').src.endsWith("{% static 'feed/img/active_dislike.png' %}")) {
-                    document.getElementById(post_pk + '_dislike_button').src = "{% static 'feed/img/inactive_dislike.png' %}"
-                    document.getElementById(post_pk + '_dislike_input').value = Number(document.getElementById(post_pk + '_dislike_input').value) - 1;
-
-                }
-
-                $.ajax("{% url 'like_post' %}", get_ajax_data(post_pk))
-                document.getElementById(post_pk + '_like_input').value = Number(document.getElementById(post_pk + '_like_input').value) + 1;
-                document.getElementById(post_pk + '_like_button').src = "{% static 'feed/img/active_like.png' %}"
-            }
-            else {
-                unlike_post(post_pk)
-                document.getElementById(post_pk + '_like_button').src = "{% static 'feed/img/inactive_like.png' %}"
-            }
-        }
-
-        function dislike_post(post_pk) {
-            if (document.getElementById(post_pk + '_dislike_button').src.endsWith("{% static 'feed/img/inactive_dislike.png' %}"))
-            {
-                if (document.getElementById(post_pk + '_like_button').src.endsWith("{% static 'feed/img/active_like.png' %}")) {
-                    document.getElementById(post_pk + '_like_button').src = "{% static 'feed/img/inactive_like.png' %}"
-                    document.getElementById(post_pk + '_like_input').value = Number(document.getElementById(post_pk + '_like_input').value) - 1;
-
-                }
-                $.ajax("{% url 'dislike_post' %}", get_ajax_data(post_pk))
-                document.getElementById(post_pk + '_dislike_input').value = Number(document.getElementById(post_pk + '_dislike_input').value) + 1;
-                document.getElementById(post_pk + '_dislike_button').src = "{% static 'feed/img/active_dislike.png' %}"
-            }
-            else {
-                undislike_post(post_pk)
-                document.getElementById(post_pk + '_dislike_button').src = "{% static 'feed/img/inactive_dislike.png' %}"
-            }
-        }
-
-        function unlike_post(post_pk) {
-            $.ajax("{% url 'unlike_post' %}", get_ajax_data(post_pk))
-            document.getElementById(post_pk + '_like_input').value = Number(document.getElementById(post_pk + '_like_input').value) - 1;
-        }
-
-        function undislike_post(post_pk) {
-            document.getElementById(post_pk + '_dislike_input').value = Number(document.getElementById(post_pk + '_dislike_input').value) - 1;
-            $.ajax("{% url 'undislike_post' %}", get_ajax_data(post_pk))
-        }
-        function send_comment(post_pk) {
-            let form = document.getElementById(post_pk + '_comment_form')
-            const formData = new FormData(form);
-
-            let data = {};
-
-            for (let [key, value] of formData) {
-                data[key] = value
-            }
-            $.ajax("{% url 'send_comment' %}", {
-                'type': "POST",
-                'data': data
-            })
-        }
-    </script>
-{% endblock %}
-

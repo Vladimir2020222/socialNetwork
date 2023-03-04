@@ -12,7 +12,6 @@ from django.views.generic.base import ContextMixin
 from feed.forms import FormNameInput
 from feed.models import Post
 
-
 __all__ = ['VerifyAuthorMixin', 'MultiFromMixin']
 
 
@@ -48,9 +47,9 @@ class DefaultMethods:
         kwargs = self.form_method(form_name, 'get_form_kwargs')()
         form: BaseForm = self.form_method(form_name, 'get_form_class')()(**kwargs)
 
-        form.fields['form_name'] = forms.CharField(required=False, widget=FormNameInput(
+        form.fields[self.form_name_html_field_name] = forms.CharField(required=False, widget=FormNameInput(
             attrs={
-                    'value': form_name,
+                'value': form_name,
             }))
 
         return form
@@ -62,7 +61,7 @@ class DefaultMethods:
         }
 
         if self.request.method in ('POST', 'PUT') and \
-           self.request.POST.get(self.form_name_html_field_name) == form_name:
+                self.request.POST.get(self.form_name_html_field_name) == form_name:
             kwargs.update(
                 {
                     'data': self.request.POST,
@@ -98,8 +97,8 @@ class MultiFormMixinMeta(type):
 
         attrs['forms'] = mcs.normalize_forms(attrs['forms'])
 
-        class FormMethodsBase:
-            pass
+        class FormMethodsBase:  # methods from DefaultMethods will be added to this class. It will be added to the
+            pass  # end of bases. It is used to let call super().<form_name>_<method_name>()
 
         necessary_in_process_method_names = {}
         form_names = [f_conf['form_name'] for f_conf in attrs['forms']]
@@ -107,29 +106,26 @@ class MultiFormMixinMeta(type):
         for default_method_name, method in inspect.getmembers(
                 DefaultMethods, predicate=inspect.isfunction
         ):
-            necessary_in_process = getattr(method, 'necessary_in_process', None)
+            necessary_in_process = getattr(method, 'necessary_in_process', None)    # is method used by DefaultMethods
             if necessary_in_process:
                 necessary_in_process_method_names[default_method_name] = default_method_name
-            if (not default_method_name.startswith('_')) or necessary_in_process:
+            if not default_method_name.startswith('_'):
                 for form_name in form_names:
-                    if necessary_in_process:
-                        method_name = default_method_name
-                    else:
-                        method_name = f'{form_name}_{default_method_name}'
-                    if necessary_in_process:
-                        partial_method = method
-                    else:
-                        partial_method = partialmethod(method, form_name=form_name)
-                    if not hasattr(FormMethodsBase, method_name):
-                        setattr(FormMethodsBase, method_name, partial_method)
+                    method_name = f'{form_name}_{default_method_name}'
+                    partial_method = partialmethod(method, form_name=form_name)
 
-        bases = bases + (FormMethodsBase, )
+                    setattr(FormMethodsBase, method_name, partial_method)
+            elif necessary_in_process:
+                setattr(FormMethodsBase, default_method_name, method)
+
+        bases = bases + (FormMethodsBase,)
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
+        # verifying that child class doesn't override methods that is used by MethodsBase
         for necessary_method_name in necessary_in_process_method_names:
             cls_method = getattr(new_class, necessary_method_name)
-            if not getattr(cls_method, 'necessary_in_process', None) is True:
+            if not hasattr(cls_method, 'necessary_in_process'):
                 raise ImproperlyConfigured(
                     'class %s overrides %s method that is necessary for automatic generation'
                     'methods for form processes' % (name, necessary_method_name)
@@ -215,4 +211,3 @@ class MultiFromMixin(IsMultiFromMixin, ContextMixin, metaclass=MultiFormMixinMet
         if form.is_valid():
             return self.form_method(form_name, 'form_valid')(form)
         return self.form_method(form_name, 'form_invalid')(form)
-

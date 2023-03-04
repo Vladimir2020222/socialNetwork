@@ -1,20 +1,25 @@
 from django import template
 from django.contrib.auth.models import User
 
-from feed.models import Post
+from feed.models import LikeablePermission
 
 register = template.Library()
 
 
-@register.filter(name='has_liked_by')
-def has_liked_by(post: Post, user: User):
+@register.filter
+def has_liked_by(model: LikeablePermission, user: User):
     if user.is_anonymous:
         return False
-    return post.likes.contains(user)
+    return model.likes.contains(user)
 
 
-@register.filter(name='has_disliked_by')
-def has_disliked_by(post: Post, user: User):
+@register.filter
+def has_disliked_by(model: LikeablePermission, user: User):
     if user.is_anonymous:
         return False
-    return post.dislikes.contains(user)
+    return model.dislikes.contains(user)
+
+
+@register.filter
+def render_with_request(obj, request):
+    return obj.render(request=request)

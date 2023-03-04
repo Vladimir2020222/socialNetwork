@@ -32,12 +32,12 @@ class RegisterView(FormView):
         return super().form_valid(form)
 
 
-class ChangePasswordView(DefaultPasswordChangeView):
+class PasswordChangeView(DefaultPasswordChangeView):
     template_name = 'accounts/password_change.html'
     success_url = reverse_lazy('password_change_done')
 
 
-class ChangePasswordDoneView(DefaultPasswordChangeDoneView):
+class PasswordChangeDoneView(DefaultPasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
 
 
@@ -45,6 +45,9 @@ class ChangePasswordDoneView(DefaultPasswordChangeDoneView):
 
 
 class ProfileView(TemplateView):
-    def dispatch(self, request, *args, **kwargs):
-        return redirect(reverse_lazy('home'))
+    template_name = 'accounts/profile.html'
+
+
+class UserProfileView(TemplateView):
+    template_name = 'accounts/user_profile.html'
 
