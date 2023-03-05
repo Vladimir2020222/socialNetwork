@@ -2,12 +2,12 @@
 {% load templatetags %}
 {% load feed %}
 
-<div class="post" id="{{ post.pk }}_post">
+<div class="main-content-block post" id="{{ post.pk }}_post">
     {# main info #}
     <a href="{{ post.author.get_absolute_url }}">
         <img class="user-ava" src="{{ post.author.ava.url }}" alt="ava">
     </a>
-    <h3 class="user-name">{{ post.author }}</h3>
+    <h3 class="user-username">{{ post.author }}</h3>
     <h2>{{ post.title }}</h2>
     <p>
         {% if post.text|length < 1000 %}
@@ -25,7 +25,7 @@
          onmouseover="show_img_change_arrows({{ post.pk }})"
          onmouseleave="hide_img_change_arrows({{ post.pk }})">
         {% for i, image in post.images.all|enumerate %}
-            <img id="{{ post.pk }}_{{ i }}" src="{{ image.img.url }}" width="800" height="800" alt="image"
+            <img class="post-image" id="{{ post.pk }}_{{ i }}" src="{{ image.img.url }}" alt="image"
                  {% if i > 0 %}hidden{% endif %}><br>
         {% endfor %}
         <img id="{{ post.pk }}_last_img" src="{% static 'feed/img/last_image.svg' %}"

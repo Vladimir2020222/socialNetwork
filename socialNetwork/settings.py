@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-fw(!=alufcycc6sjzrvcj=b%cvxd0zzew88-xphd^qy2k^%9pv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -59,8 +59,7 @@ ROOT_URLCONF = 'socialNetwork.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,6 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'socialNetwork.wsgi.application'
 
+LOGIN_URL = reverse_lazy('login')
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -133,8 +133,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'common_staticfiles')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -147,10 +148,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # feed
 
 MAIN_MENU_LINKS = [
-    (reverse_lazy('main'), 'feed'),
-    (reverse_lazy('post_create'), 'create_post'),
-    (reverse_lazy('profile'), 'profile'),
-    (reverse_lazy('login'), 'login'),
-    (reverse_lazy('logout'), 'logout')
+    ('main', 'feed'),
+    ('post_create', 'create_post'),
+    ('profile', 'profile'),
+    ('login', 'login'),
+    ('logout', 'logout'),
+    ('register', 'register')
 ]
-

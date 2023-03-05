@@ -1,5 +1,3 @@
-from enum import Enum
-
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
@@ -12,11 +10,11 @@ from django.views.decorators.http import require_POST
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
-from django.views.generic.base import TemplateView
 
 from .forms import CreatePostFrom, UpdatePostFrom, CommentForm, AnswerForm
 from feed.models import Post, Comment
-from .mixins import MultiFromMixin, VerifyAuthorMixin
+from .mixins import VerifyAuthorMixin
+from .services import like_or_dislike_object
 
 
 class MainView(ListView):
@@ -66,15 +64,8 @@ class PostDetailView(DetailView):
     model = Post
 
 
-class LikeActions(Enum):
-    like = 0
-    unlike = 1
-    dislike = 2
-    undislike = 3
-
-
 class LikeAjaxView(View):
-    action = None
+    action: int = None
     model: Model = None
 
     @method_decorator(require_POST)
@@ -84,25 +75,16 @@ class LikeAjaxView(View):
     def post(self, request):
         obj = self.get_object()
         user = request.user
-        match self.action:
-            case LikeActions.like:
-                obj.dislikes.remove(user)
-                obj.likes.add(user)
-            case LikeActions.unlike:
-                obj.likes.remove(user)
-            case LikeActions.dislike:
-                obj.likes.remove(user)
-                obj.dislikes.add(user)
-            case LikeActions.undislike:
-                obj.dislikes.remove(user)
+        like_or_dislike_object(obj, user, self.action)
         return HttpResponse('')
 
     def get_object(self):
         if self.model is None:
             raise ImproperlyConfigured('model is not provided, impossible to get object,'
                                        ' define model or override get_object')
-        return get_object_or_404(self.model._default_manager,
-                                 pk=self.request.POST.get(f'{self.model._meta.model_name}_pk'))
+        queryset = self.model._default_manager
+        pk = self.request.POST.get(f'{self.model._meta.model_name}_pk')
+        return get_object_or_404(queryset, pk=pk)
 
 
 class PostLikeAjaxView(LikeAjaxView):
@@ -131,9 +113,7 @@ def send_answer_to_comment(request):
 
 @require_POST
 def get_post_comments(request):
-    print(request.POST)
-    context = {'post': Post.objects.get(
-        pk=request.POST.get('post_pk')
-    )}
+    pk = request.POST.get('post_pk')
+    context = {'post': Post.objects.get(pk=pk)}
     return render(request, 'feed/renderable/comments.html', context)
 

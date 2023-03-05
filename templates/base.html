@@ -3,9 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="{% static 'feed/css/main.css' %}" rel="stylesheet" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css">
     {% block head %}{% endblock %}
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}{{ title }}{% endblock %}</title>
 </head>
 <body>
 <div id="main-left-menu">
@@ -22,10 +23,6 @@
 
     {% endblock %}
 </div>
-
-{% block scripts %}
-
-{% endblock %}
 <script>
     const csrf_token = "{{ csrf_token }}"
     const urls = {
@@ -47,8 +44,11 @@
         'active_like': "{% static 'feed/img/active_like.png' %}",
         'inactive_dislike': "{% static 'feed/img/inactive_dislike.png' %}",
         'active_dislike': "{% static 'feed/img/active_dislike.png' %}"
-
     }
 </script>
+
+{% block scripts %}
+
+{% endblock %}
 </body>
 </html>

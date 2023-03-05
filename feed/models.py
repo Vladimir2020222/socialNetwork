@@ -1,24 +1,22 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models import QuerySet, Manager
-from django.forms.renderers import get_default_renderer
-from django.forms.utils import RenderableMixin
 from django.urls import reverse
-from django.utils.module_loading import import_string
 from socialNetwork.utils import RequestRenderableMixin
 
-User: User = get_user_model()
+User = get_user_model()
 
 
 class Image(models.Model):
+    """Post image"""
+
     img = models.ImageField(upload_to='posts/%Y/%m/%d/')
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='images', related_query_name='image')
 
 
 class LikeablePermission(models.Model):
+    """Permission for models that can be liked by user"""
 
     likes = models.ManyToManyField(User,
                                    related_name='%(app_label)s_liked_%(class)ss',
@@ -32,6 +30,8 @@ class LikeablePermission(models.Model):
 
 
 class DatePermission(models.Model):
+    """Permission for models whose time publish and time update should be saved"""
+
     date_published = models.DateTimeField(auto_now_add=True)
     data_update = models.DateTimeField(auto_now=True)
 

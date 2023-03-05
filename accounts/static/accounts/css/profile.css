@@ -1,0 +1,32 @@
+.profile-user-ava {
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    height: 120px;
+    width: 120px;
+}
+
+.main-profile-user-data {
+    display: inline-block;
+    position: relative;
+    bottom: 13px;
+}
+
+.profile-user-username {
+    display: inline;
+    color: #aaa;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.profile-user-full-name {
+    margin: 12px 0 12px 0;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.profile-user-age {
+    margin: 4px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ddd;
+}

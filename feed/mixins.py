@@ -16,10 +16,13 @@ __all__ = ['VerifyAuthorMixin', 'MultiFromMixin']
 
 
 class VerifyAuthorMixin:
+    """Used during post deletion and update to allow these actions only for post
+    author and users that have feed.change_post permission"""
+
     def _verify_author(self):
         user = self.request.user
         if user != Post.objects.get(pk=self.kwargs.get('pk')).author and not user.has_perm('feed.change_post'):
-            return PermissionDenied()
+            raise PermissionDenied()
 
     def dispatch(self, request, *args, **kwargs):
         self._verify_author()
@@ -27,6 +30,8 @@ class VerifyAuthorMixin:
 
 
 class DefaultMethods:
+    """Helper class for MultiFormMixinMeta"""
+
     def _get_attr(self, form_name, attr_name):
         for conf in self.forms:
             if conf['form_name'] == form_name:
@@ -91,6 +96,9 @@ class DefaultMethods:
 
 
 class MultiFormMixinMeta(type):
+    """Adds methods from DefaultMethods to FormMethodsBase, and puts it in the
+    end of bases, this lets call super()"""
+
     def __new__(mcs, name, bases, attrs):
         if IsMultiFromMixin in bases:
             return super().__new__(mcs, name, bases, attrs)
@@ -169,6 +177,7 @@ class MultiFormMixinMeta(type):
 
 
 class IsMultiFromMixin:
+    """Used by MultiFormMixinMeta to just return MultiFormMixin class as is, without any changes."""
     pass
 
 

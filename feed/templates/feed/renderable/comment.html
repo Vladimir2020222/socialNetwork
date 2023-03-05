@@ -6,7 +6,7 @@
     <a href="{{ comment.author.get_absolute_url }}">
         <img class="user-ava" src="{{ comment.author.ava.url }}" alt="ava">
     </a>
-    <h3 class="user-name">{{ comment.author }}</h3>
+    <h3 class="user-username">{{ comment.author }}</h3>
     <p style="margin-left: {{ comment.level|mul:20|add:20 }}px;">{% if comment.text|length < 650 %}
         {{ comment.text }}
         {% else %}

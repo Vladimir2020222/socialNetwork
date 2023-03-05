@@ -1,6 +1,8 @@
 from django.urls import path
+
+from feed.services import LikeActions
 from feed.views import MainView, CreatePostView, UpdatePostView, PostDetailView, DeletePostView, PostLikeAjaxView, \
-    CommentLikeAjaxView, LikeActions, send_comment, send_answer_to_comment, get_post_comments
+    CommentLikeAjaxView, send_comment, send_answer_to_comment, get_post_comments
 
 
 urlpatterns = [

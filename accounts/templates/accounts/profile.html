@@ -1,10 +1,25 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+{% load feed %}
 
-</body>
-</html>
+{% block head %}
+    <link href="{% static 'accounts/css/profile.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'feed/css/feed.css' %}" rel="stylesheet" type="text/css">
+    <script src="{% static 'feed/js/feed.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="main-content-block">
+        <img class="profile-user-ava" src="{{ owner.ava.url }}" alt="avatar">
+        <div class="main-profile-user-data">
+            <div class="profile-user-username">@{{ owner.username }}</div>
+            <div class="profile-user-full-name">{{ owner.get_full_name }}</div>
+            <div class="profile-user-age">{{ owner.age }} years old</div>
+        </div>
+    <div class="profile-user-age">{{ owner.subscribers.count }} subscribers</div>
+    </div>
+    {% for post in owner.posts.all %}
+        {{ post|render_with_request:request }}
+    {% endfor %}
+
+{% endblock %}

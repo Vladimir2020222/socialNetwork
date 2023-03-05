@@ -24,11 +24,13 @@ input.like-counter {
     text-align: right;
 }
 
+.post-image {
+    padding: 5px 40px 5px 40px;
+    width: 500px;
+    height: 500px;
+}
+
 .post {
-    border-radius: 25px;
-    padding: 25px;
-    margin: 15px 0 15px 0;
-    border: 2px solid rgba(255, 255, 255, 0.12);
 }
 
 .comment {
