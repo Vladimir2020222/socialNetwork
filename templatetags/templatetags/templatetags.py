@@ -9,5 +9,10 @@ def do_enumerate(value):
 
 
 @register.filter(name='mul')
-def mul(a, b):
+def do_mul(a, b):
     return a * b
+
+
+@register.filter
+def to_string(value):
+    return str(value)

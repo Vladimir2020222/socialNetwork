@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        let watched_posts = [];
+        let loaded_post_ids = [];
+        let additional_posts_count = null;
+        let additional_posts_count_increment = 5;
+
+        try {
+            page_contains_posts
+        }
+        catch (e) {
+            page_contains_posts = false;
+        }
+
+        try {
+            posts_from_subscriptions
+        }
+        catch (e) {
+            posts_from_subscriptions = false;
+        }
+
+        try {
+            page_owner_pk
+        }
+        catch (e) {
+            page_owner_pk = null;
+        }
+
+        if (posts_from_subscriptions && page_owner_pk !== null) {
+            throw Error("posts_from_subscriptions and page_owner_pk can't be defined together")
+        }
+
+        if (!page_contains_posts && page_owner_pk !== null) {
+            throw Error("posts_from_subscriptions is false, but page_owner_pk is defined")
+        }
+
+        if (!page_contains_posts && posts_from_subscriptions !== null) {
+            throw Error("posts_from_subscriptions is false, but posts_from_subscriptions is defined")
+        }
+
+        window.onscroll = function () {
+            if (page_contains_posts && user_is_authenticated) {
+                for (let post_id of loaded_post_ids) {
+                    if (come(document.getElementById(post_id + '_post_text'))) {
+                        if (!watched_posts.includes(post_id)) {
+                            watched_posts.push(post_id)
+                            ajaxPOST(urls['add_post_to_viewed'], {'data': {'post_pk': post_id}})
+                        }
+                    }
+                }
+            }
+            if (come(document.getElementById('feed-end'))) {
+                document.getElementById('feed-end').remove()
+                function success(data) {
+                    additional_posts_count += additional_posts_count_increment;
+                    document.getElementById('main-content').innerHTML += data;
+                }
+                let data = {};
+                if (posts_from_subscriptions) {
+                    data = {'subscriptions': true}
+                }
+                else if (page_owner_pk != null) {
+                    data = {'author_pk': page_owner_pk}
+                }
+                if (additional_posts_count != null) {
+                    data['n'] = additional_posts_count
+                }
+                console.log('additional loading')
+                ajaxPOST(urls['get_additional_posts'], {
+                    'data': data,
+                    'success': success
+                })
+            }
+        }
+    </script>
+{% endblock %}

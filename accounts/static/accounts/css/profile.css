@@ -5,7 +5,18 @@
     width: 120px;
 }
 
-.main-profile-user-data {
+.change-ava-btn {
+    width: 120px;
+    padding-left: 5px;
+    background-color: #606060;
+    border-radius: 5px;
+    border: 1px solid #777;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.main-profile-user-info {
     display: inline-block;
     position: relative;
     bottom: 13px;
@@ -29,4 +40,31 @@
     font-size: 18px;
     font-weight: 600;
     color: #ddd;
+}
+
+.profile-secondary-info {
+    margin: 5px;
+    font-size: 16px;
+    color: #d0d0d0;
+}
+
+.subscribe-btn-wrapper {
+    align-content: center;
+    text-align: center;
+}
+
+.subscribe-btn {
+    height: 30px;
+    font-size: 18px;
+    padding: 9px;
+    border-radius: 2px;
+    color: #eee;
+}
+
+.subscribe-btn-inactive {
+    background-color: #4d6dde;
+}
+
+.subscribe-btn-active {
+    background-color: #606060;
 }

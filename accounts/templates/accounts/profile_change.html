@@ -1,11 +1,11 @@
-{% extends 'feed/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
-    create post
+    change profile
 {% endblock %}
 
 {% block content %}
-    <form action="{% url 'post_create' %}" method="post" enctype="multipart/form-data">
+    <form action="{% url 'profile_change' %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">submit</button>

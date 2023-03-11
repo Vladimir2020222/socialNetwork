@@ -1,4 +1,7 @@
 from django.db import connection
+from django.db.backends.base.base import BaseDatabaseWrapper
+
+connection: BaseDatabaseWrapper
 
 
 class QueriesManager:
@@ -19,11 +22,15 @@ class QueriesManager:
 
     def __repr__(self):
         for i in self.queries:
+            i = i.replace('"', '')
             print(i)
         return ''
 
     def __len__(self):
         return len(self.queries)
+
+    def clear(self):
+        connection.queries_log.clear()
 
     __str__ = __repr__
 

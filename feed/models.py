@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import QuerySet, Manager
+from django.db.models import QuerySet, F, Count
 from django.urls import reverse
 from socialNetwork.utils import RequestRenderableMixin
+from q import q
 
 User = get_user_model()
 
@@ -39,10 +40,33 @@ class DatePermission(models.Model):
         abstract = True
 
 
+class PostQuerySet(QuerySet):
+    def sort_by_relevance(self):
+        """Relevance counter is (likes + 1 - dislikes) / (views + 1) + ((comments / views + 1) / 2)
+                                                   ^                                ^
+                                                  |                                 |
+                                        likes to view ratio      +      comments to view ratio / 2
+        ratio of comments to view is divided by 2 because ratio of likes to view is more important.
+                                """
+        return self.annotate(Count('likes', distinct=True),  # likes counter
+                             Count('dislikes', distinct=True),  # dislikes counter
+                             comments__count=Count('comment', distinct=True),  # comment counter
+                             viewers__count=Count('viewer', distinct=True)  # views counter
+                             ). \
+            annotate(relevance_coefficient=(F('likes__count') + 1 - F('dislikes__count')) /
+                                           (F('viewers__count') + 1.0) +
+                                           (F('comments__count') / (F('viewers__count') + 1.0)) / 2). \
+            order_by('-relevance_coefficient')
+
+    def exclude_viewed(self, user):
+        return self.exclude(pk__in=user.viewed_posts.only('pk'))
+
+
 class Post(LikeablePermission, DatePermission, RequestRenderableMixin):
-    author = models.ForeignKey(User, on_delete=models.DO_NOTHING,
+    objects = PostQuerySet.as_manager()
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='posts', related_query_name='post')
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=80, blank=True)
     text = models.TextField(max_length=15000)
 
     template_name = 'feed/renderable/post.html'
@@ -67,9 +91,9 @@ class CommentQuerySet(QuerySet):
 
 
 class Comment(LikeablePermission, DatePermission, RequestRenderableMixin):
-    objects = Manager.from_queryset(CommentQuerySet)()
+    objects = CommentQuerySet.as_manager()
 
-    author = models.ForeignKey(User, on_delete=models.DO_NOTHING,
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='comments', related_query_name='comment')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments',
                              related_query_name='comment')

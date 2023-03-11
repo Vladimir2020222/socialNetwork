@@ -21,5 +21,10 @@ def has_disliked_by(model: LikeablePermission, user: User):
 
 
 @register.filter
+def is_subscribed_to(user: User, user2: User):
+    return user2.subscribers.contains(user)
+
+
+@register.filter
 def render_with_request(obj, request):
     return obj.render(request=request)

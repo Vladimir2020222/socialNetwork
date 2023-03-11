@@ -1,25 +1,83 @@
-{% extends 'base.html' %}
+{% extends 'feed/base.html' %}
 {% load static %}
 {% load feed %}
+
+{% block title %}
+    {% if owner == user %}
+        profile
+    {% else %}
+        {{ owner.username }}
+    {% endif %}
+{% endblock %}
 
 {% block head %}
     <link href="{% static 'accounts/css/profile.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'feed/css/feed.css' %}" rel="stylesheet" type="text/css">
     <script src="{% static 'feed/js/feed.js' %}"></script>
+    <script src="{% static 'accounts/js/profile.js' %}"></script>
 {% endblock %}
 
 {% block content %}
     <div class="main-content-block">
-        <img class="profile-user-ava" src="{{ owner.ava.url }}" alt="avatar">
-        <div class="main-profile-user-data">
+        <div>
+            <img id="user-ava" class="profile-user-ava" src="{{ owner.ava.url }}" alt="avatar"><br>
+            {% if user == owner %}
+                <div class="change-ava-btn" style="position:relative; bottom: 20px">
+                    <form action="{% url 'change_ava' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label for="input-img-ava">
+                            change
+                        </label>
+                        <input id="input-img-ava" type="file" accept="image/*" name="ava" hidden
+                        onchange="document.getElementById('submit-user-ava').click()">
+                        <button id="submit-user-ava" type="submit" hidden></button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        <div class="main-profile-user-info">
             <div class="profile-user-username">@{{ owner.username }}</div>
             <div class="profile-user-full-name">{{ owner.get_full_name }}</div>
             <div class="profile-user-age">{{ owner.age }} years old</div>
         </div>
-    <div class="profile-user-age">{{ owner.subscribers.count }} subscribers</div>
+        <div class="profile-secondary-info">
+            <p>{{ owner.subscribers.count }} subscribers
+            {{ owner.total_likes }} likes
+            {{ owner.total_dislikes }} dislikes</p>
+        </div>
+        <div>
+        {% if user != owner %}
+            <div class="subscribe-btn-wrapper">
+                {% if user|is_subscribed_to:owner %}
+                    <div style="display: inline" id="sub_btn_active" class="subscribe-btn subscribe-btn-active"
+                         onclick="unsubscribe({{ owner.pk }})">unsubscribe</div>
+                    <div style="display: none" id="sub_btn_inactive" class="subscribe-btn subscribe-btn-inactive"
+                         onclick="subscribe({{ owner.pk }})">subscribe</div>
+                {% else %}
+                    <div style="display: none" id="sub_btn_active" class="subscribe-btn subscribe-btn-active"
+                         onclick="unsubscribe({{ owner.pk }})">unsubscribe</div>
+                    <div style="display: inline" id="sub_btn_inactive" class="subscribe-btn subscribe-btn-inactive"
+                         onclick="subscribe({{ owner.pk }})">subscribe</div>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if user == owner %}
+            <a href="{% url 'profile_change' %}"><button>change profile</button></a>
+        {% endif %}
+        </div>
     </div>
-    {% for post in owner.posts.all %}
+
+    {% for post in posts %}
+        {% if forloop.last %}
+                <div id="feed-end"></div>
+        {% endif %}
         {{ post|render_with_request:request }}
     {% endfor %}
+{% endblock %}
 
+{% block scripts %}
+    <script>
+        let page_contains_posts = true
+    </script>
+    {{ block.super }}
 {% endblock %}

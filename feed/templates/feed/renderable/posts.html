@@ -1,0 +1,8 @@
+{% load feed %}
+
+{% for post in posts %}
+    {% if forloop.last %}
+        <div id="feed-end"></div>
+    {% endif %}
+    {{ post|render_with_request:request }}
+{% endfor %}

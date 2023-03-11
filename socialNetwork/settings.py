@@ -15,6 +15,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from django.urls import reverse_lazy
 
+from socialNetwork.context_processors import MainMenuLink
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -48,10 +50,11 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'socialNetwork.middleware.DebugMiddleware'
 ]
 
 ROOT_URLCONF = 'socialNetwork.urls'
@@ -148,10 +151,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # feed
 
 MAIN_MENU_LINKS = [
-    ('main', 'feed'),
-    ('post_create', 'create_post'),
-    ('profile', 'profile'),
-    ('login', 'login'),
-    ('logout', 'logout'),
-    ('register', 'register')
+    MainMenuLink('main', 'feed'),
+    MainMenuLink('post_create', 'create_post', auth=True),
+    MainMenuLink('profile', 'profile', auth=True),
+    MainMenuLink('login', 'login'),
+    MainMenuLink('logout', 'logout', auth=True),
+    MainMenuLink('register', 'register', auth=False),
+    MainMenuLink('subscriptions', 'subscriptions', auth=True)
 ]

@@ -9,7 +9,7 @@
     </a>
     <h3 class="user-username">{{ post.author }}</h3>
     <h2>{{ post.title }}</h2>
-    <p>
+    <p id="{{ post.pk }}_post_text">
         {% if post.text|length < 1000 %}
             {{ post.text }}
         {% else %}
@@ -36,6 +36,7 @@
 
     {# statistics #}
     <div class="post-statistics">
+        views: {{ post.viewers__count|add:1 }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         likes: <input class="like-counter" id="{{ post.pk }}_like_input" type="text"
                       value="{{ post.likes.count }}" readonly>
         <div style="padding: 15px; display: inline-block" onclick="like_post({{ post.pk }})">
@@ -76,4 +77,8 @@
     {% if post.author == user or perms.feed.delete_post %}
         <a href="{% url 'post_update' post.pk %}">change</a>
     {% endif %}
+    <script>
+        console.log({{ post.pk }}, 'is loaded')
+        loaded_post_ids.push({{ post.pk }})
+    </script>
 </div>

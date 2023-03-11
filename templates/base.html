@@ -1,4 +1,5 @@
 {% load static %}
+{% load templatetags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,26 +18,40 @@
     </ul>
 </div>
 
+{% block scripts %} {# this block is here because of when posts are rendered, they add their id to var, therefore #}
+                    {# this var must be defined before posts are rendered #}
+{% endblock %}
+
 
 <div id="main-content">
     {% block content %}
 
     {% endblock %}
 </div>
+
 <script>
+    const user_is_authenticated = {{ user.is_authenticated|to_string|lower }}
     const csrf_token = "{{ csrf_token }}"
     const urls = {
         'like_post': "{% url 'like_post' %}",
         'dislike_post': "{% url 'dislike_post' %}",
         'unlike_post': "{% url 'unlike_post' %}",
         'undislike_post': "{% url 'undislike_post' %}",
+
         'like_comment': "{% url 'like_comment' %}",
         'dislike_comment': "{% url 'dislike_comment' %}",
         'unlike_comment': "{% url 'unlike_comment' %}",
         'undislike_comment': "{% url 'undislike_comment' %}",
+
         'send_comment': "{% url 'send_comment' %}",
         'send_answer_to_comment': "{% url 'send_answer_to_comment' %}",
-        'get_post_comments': "{% url 'get_post_comments' %}"
+
+        'get_additional_posts': "{% url 'get_additional_posts' %}",
+        'get_post_comments': "{% url 'get_post_comments' %}",
+
+        'unsubscribe':"{% url 'unsubscribe' %}",
+        'subscribe': "{% url 'subscribe' %}",
+        'add_post_to_viewed': "{% url 'add_post_to_viewed' %}"
     }
 
     const staticfiles = {
@@ -45,10 +60,25 @@
         'inactive_dislike': "{% static 'feed/img/inactive_dislike.png' %}",
         'active_dislike': "{% static 'feed/img/active_dislike.png' %}"
     }
+
+    function ajaxPOST(url, options) {
+        options['type'] = 'POST'
+        if (options['data'] === undefined) {
+            options['data'] = {}
+        }
+        options['data']['csrfmiddlewaretoken'] = csrf_token
+        return $.ajax(url, options)
+    }
+
+    function ajax_data_POST(url, data) {
+        let options = {
+            'type': 'POST',
+            'data': data
+        }
+        options['data']['csrfmiddlewaretoken'] = csrf_token
+        return $.ajax(url, options)
+    }
+
 </script>
-
-{% block scripts %}
-
-{% endblock %}
 </body>
 </html>

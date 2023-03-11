@@ -35,8 +35,5 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'auth_user',
             },
-            managers=[
-                ('objects', accounts.models.UserManager()),
-            ],
         ),
     ]

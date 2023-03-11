@@ -1,17 +1,3 @@
-function get_post_ajax_data(post_pk) {
-    return {
-        'type': 'POST',
-        'data': {'post_pk': post_pk, 'csrfmiddlewaretoken': csrf_token }
-    }
-}
-
-function get_comment_ajax_data(comment_pk) {
-    return {
-        'type': 'POST',
-        'data': {'comment_pk': comment_pk, 'csrfmiddlewaretoken': csrf_token }
-    }
-}
-
 function like_post(post_pk) {
     if (document.getElementById(post_pk + '_like_button').src.endsWith(staticfiles['inactive_like'])) {
         if (document.getElementById(post_pk + '_dislike_button').src.endsWith(staticfiles['active_dislike'])) {
@@ -21,7 +7,7 @@ function like_post(post_pk) {
 
         }
 
-        $.ajax(urls['like_post'], get_post_ajax_data(post_pk))
+        ajax_data_POST(urls['like_post'], {'post_pk': post_pk})
         document.getElementById(post_pk + '_like_input').value =
             Number(document.getElementById(post_pk + '_like_input').value) + 1;
         document.getElementById(post_pk + '_like_button').src = staticfiles['active_like']
@@ -39,7 +25,7 @@ function dislike_post(post_pk) {
                 Number(document.getElementById(post_pk + '_like_input').value) - 1;
 
         }
-        $.ajax(urls['dislike_post'], get_post_ajax_data(post_pk))
+        ajax_data_POST(urls['dislike_post'], {'post_pk': post_pk})
         document.getElementById(post_pk + '_dislike_input').value =
             Number(document.getElementById(post_pk + '_dislike_input').value) + 1;
         document.getElementById(post_pk + '_dislike_button').src = staticfiles['active_dislike']
@@ -50,7 +36,7 @@ function dislike_post(post_pk) {
 }
 
 function unlike_post(post_pk) {
-    $.ajax(urls['unlike_post'], get_post_ajax_data(post_pk))
+    ajax_data_POST(urls['unlike_post'], {'post_pk': post_pk})
     document.getElementById(post_pk + '_like_input').value =
         Number(document.getElementById(post_pk + '_like_input').value) - 1;
 }
@@ -58,7 +44,7 @@ function unlike_post(post_pk) {
 function undislike_post(post_pk) {
     document.getElementById(post_pk + '_dislike_input').value =
         Number(document.getElementById(post_pk + '_dislike_input').value) - 1;
-    $.ajax(urls['undislike_post'], get_post_ajax_data(post_pk))
+    ajax_data_POST(urls['undislike_post'], {'post_pk': post_pk})
 }
 
 function like_comment(comment_pk) {
@@ -70,7 +56,7 @@ function like_comment(comment_pk) {
 
         }
 
-        $.ajax(urls['like_comment'], get_comment_ajax_data(comment_pk))
+        ajax_data_POST(urls['like_comment'], {'comment_pk': comment_pk})
         document.getElementById(comment_pk + '_comment_like_input').value =
             Number(document.getElementById(comment_pk + '_comment_like_input').value) + 1;
         document.getElementById(comment_pk + '_comment_like_button').src = staticfiles['active_like']
@@ -88,7 +74,7 @@ function dislike_comment(comment_pk) {
                 Number(document.getElementById(comment_pk + '_comment_like_input').value) - 1;
         }
 
-        $.ajax(urls['dislike_comment'], get_comment_ajax_data(comment_pk))
+        ajax_data_POST(urls['dislike_comment'], {'comment_pk': comment_pk})
         document.getElementById(comment_pk + '_comment_dislike_input').value =
             Number(document.getElementById(comment_pk + '_comment_dislike_input').value) + 1;
         document.getElementById(comment_pk + '_comment_dislike_button').src = staticfiles['active_dislike']
@@ -99,7 +85,7 @@ function dislike_comment(comment_pk) {
 }
 
 function unlike_comment(comment_pk) {
-    $.ajax(urls['unlike_comment'], get_comment_ajax_data(comment_pk))
+    ajax_data_POST(urls['unlike_comment'], {'comment_pk': comment_pk})
     document.getElementById(comment_pk + '_comment_like_input').value =
         Number(document.getElementById(comment_pk + '_comment_like_input').value) - 1;
 }
@@ -107,7 +93,7 @@ function unlike_comment(comment_pk) {
 function undislike_comment(comment_pk) {
     document.getElementById(comment_pk + '_comment_dislike_input').value =
         Number(document.getElementById(comment_pk + '_comment_dislike_input').value) - 1;
-    $.ajax(urls['undislike_comment'], get_comment_ajax_data(comment_pk))
+    ajax_data_POST(urls['undislike_comment'], {'comment_pk': comment_pk})
 }
 
 function send_comment(post_pk) {
@@ -119,8 +105,7 @@ function send_comment(post_pk) {
     for (let [key, value] of formData) {
         data[key] = value
     }
-    $.ajax(urls['send_comment'], {
-        'type': "POST",
+    ajaxPOST(urls['send_comment'], {
         'data': data
     })
     setTimeout(update_post_comments, 100, post_pk)
@@ -135,17 +120,15 @@ function send_answer(comment_pk, post_pk) {
     for (let [key, value] of formData) {
         data[key] = value
     }
-    $.ajax(urls['send_answer_to_comment'], {
-        'type': "POST",
+    ajaxPOST(urls['send_answer_to_comment'], {
         'data': data
     })
     setTimeout(update_post_comments, 100, post_pk)
 }
 
 function update_post_comments(post_pk) {
-    $.ajax(urls['get_post_comments'], {
-        'type': "POST",
-        'data': {'post_pk': post_pk, "csrfmiddlewaretoken": csrf_token},
+    ajaxPOST(urls['get_post_comments'], {
+        'data': {'post_pk': post_pk},
         'success': function (data) {
             document.getElementById(post_pk + '_comments').innerHTML = data;
         }
@@ -265,4 +248,21 @@ function hide_or_show_comment_answer_form(comment_pk) {
     else {
         active_comment_answer_form_pk = null;
     }
+}
+
+function subscribe(user_pk) {
+    ajax_data_POST(urls['subscribe'], {'user_pk': user_pk})
+}
+
+function unsubscribe(user_pk) {
+    ajax_data_POST(urls['unsubscribe'], {'user_pk': user_pk })
+}
+
+function come(elem) {
+    let docViewTop = $(window).scrollTop();
+    let docViewBottom = docViewTop + $(window).height();
+    let elemTop = $(elem).offset().top;
+    let elemBottom = elemTop + $(elem).height();
+
+  return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
 }
