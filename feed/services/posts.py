@@ -72,6 +72,10 @@ def get_random_posts(posts: QuerySet | Manager = None,
     if len(posts) <= n:
         return posts
 
+    return some_shuffle_posts(posts, n)
+
+
+def some_shuffle_posts(posts, n):
     sorted_posts = []
     cycle_n = 0
     while len(sorted_posts) < n:

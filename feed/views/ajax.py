@@ -103,7 +103,7 @@ def unsubscribe(request):
 
 
 def add_post_to_viewed(request):
-    if request.user.is_authenticated and False:
+    if request.user.is_authenticated:
         post = Post.objects.get(pk=request.POST.get('post_pk'))
         request.user.viewed_posts.add(post)
     return HttpResponse('')
