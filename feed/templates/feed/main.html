@@ -9,13 +9,14 @@
 {% endblock %}
 
 {% block head %}
+    {{ block.super }}
     <script src="{% static 'feed/js/feed.js' %}"></script>
     <link href="{% static 'feed/css/feed.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
     {% for post in posts %}
-        {% if forloop.counter >= posts|length|add:"-2" %}
+        {% if forloop.last %}
                 <div id="feed-end"></div>
         {% endif %}
         {{ post|render_with_request:request }}

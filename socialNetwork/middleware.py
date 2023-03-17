@@ -1,12 +1,13 @@
 from time import time
 
+from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.db import connection
 
 from q import q
 
 
-times = []
+requests_times = []
 
 
 def debug_sql_wrapper(execute, sql, params, many, context):
@@ -15,11 +16,12 @@ def debug_sql_wrapper(execute, sql, params, many, context):
 
 class DebugMiddleware:
     def __init__(self, get_response):
-        raise MiddlewareNotUsed()
+        if not settings.DEBUG:
+            raise MiddlewareNotUsed()
         self.get_response = get_response
 
     def __call__(self, request):
-        global times
+        global requests_times
 
         start = time()
         with connection.execute_wrapper(debug_sql_wrapper):
@@ -29,10 +31,10 @@ class DebugMiddleware:
         print(q)
 
         time_spent = end - start
-        times.append(time_spent)
+        requests_times.append(time_spent)
         print(f'\nTOTAL {len(q)} queries; '
               f'spent {time_spent} seconds; '
-              f'middle time is {sum(times)/len(times)}'
+              f'middle time is {sum(requests_times)/len(requests_times)}'
               )
         q.clear()
         return response

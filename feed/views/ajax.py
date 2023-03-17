@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.template import loader
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.http import require_POST
@@ -10,7 +11,7 @@ from feed.config import ADDITIONAL_POSTS_COUNT
 from feed.forms import CommentForm, AnswerForm
 from feed.models import Post, Comment
 from feed.services import like_or_dislike_object
-from feed.services.posts import get_random_posts, get_random_subscriptions_posts
+from feed.services import posts as posts_services
 
 
 User = get_user_model()
@@ -73,17 +74,14 @@ def get_post_comments(request):
 @require_POST
 def get_additional_posts(request):
     is_subscriptions = request.POST.get('subscriptions')
-    n = request.POST.get('n', ADDITIONAL_POSTS_COUNT)
-    if is_subscriptions:
-        posts = get_random_subscriptions_posts(request.users, n=n)
-    elif author_pk := request.POST.get('author_pk'):
-        if is_subscriptions:
-            raise ValueError("author_pk and subscriptions = True can't be used together")
-        posts = Post.objects.exclude_viewed(request.user).filter(author_pk=author_pk)[:n]
-    else:
-        posts = get_random_posts(user=request.user, n=n)
-    context = {'posts': posts}
-    return render(request, 'feed/renderable/posts.html', context)
+    n = int(request.POST.get('n', ADDITIONAL_POSTS_COUNT))
+    author_pk = request.POST.get('author_pk')
+
+    posts = posts_services.get_additional_posts(request.user, n, is_subscriptions, author_pk)
+
+    content = loader.render_to_string('feed/renderable/posts.html', {'posts': posts}, request)
+    post_ids = [post.pk for post in posts]
+    return JsonResponse({'content': content, 'loaded_posts_ids': post_ids})
 
 
 @require_POST

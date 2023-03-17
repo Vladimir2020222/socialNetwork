@@ -29,6 +29,9 @@ class VerifyAuthorMixin:
         super().dispatch(request, *args, **kwargs)
 
 
+# region useless mixins. IDK why I write them
+
+
 class DefaultMethods:
     """Helper class for MultiFormMixinMeta"""
 
@@ -220,3 +223,6 @@ class MultiFromMixin(IsMultiFromMixin, ContextMixin, metaclass=MultiFormMixinMet
         if form.is_valid():
             return self.form_method(form_name, 'form_valid')(form)
         return self.form_method(form_name, 'form_invalid')(form)
+
+
+# endregion

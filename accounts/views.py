@@ -44,7 +44,7 @@ class PasswordChangeDoneView(DefaultPasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
 
 
-# TODO password reset system
+# I can't implement password reset because I don't know how to send emails
 
 
 class UpdateProfileView(UpdateView):
@@ -63,6 +63,11 @@ class ProfileView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['owner'] = self.request.user
         context['posts'] = self.request.user.posts.order_by('-date_published')[:self.posts_in_profile]
+        context.update({
+            'subscriptions': False,
+            'author_pk': self.request.user.pk,
+            'loaded_posts_ids': [post.pk for post in context['posts']]
+        })
         return context
 
 
@@ -83,6 +88,11 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['posts'] = self.object.posts.order_by('-date_published')[:self.posts_in_profile]
+        context.update({
+            'subscriptions': False,
+            'author_pk': self.object.pk,
+            'loaded_posts_ids': [post.pk for post in context['posts']]
+        })
         return context
 
 

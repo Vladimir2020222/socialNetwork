@@ -1,9 +1,7 @@
-import warnings
-
 from django.db.models import QuerySet, Manager
 from django.contrib.auth.models import AbstractBaseUser
 
-from feed.models import Post
+from feed.models import Post, PostQuerySet
 import random
 
 
@@ -13,7 +11,7 @@ class SortedPostsWrapper(list):
                              "as queryset." % (self.__class__.__qualname__, item))
 
 
-def sort_posts_by_relevance_with_shuffle(posts: QuerySet | Manager) -> SortedPostsWrapper:
+def sort_posts_by_relevance_with_shuffle(posts: QuerySet | Manager) -> SortedPostsWrapper[Post]:
     if isinstance(posts, Manager):
         posts = posts.all()
 
@@ -35,21 +33,24 @@ def sort_posts_by_relevance_with_shuffle(posts: QuerySet | Manager) -> SortedPos
     return posts
 
 
-def get_subscriptions_posts(user, posts=None):
+def get_subscriptions_posts(user, posts=None) -> PostQuerySet:
     if posts is None:
         posts = Post.objects
     subscriptions = user.subscriptions.only('pk')
     return posts.all().filter(author__in=subscriptions).order_by('-date_published')
 
 
-def get_random_subscriptions_posts(user: AbstractBaseUser, posts=None, n=10, exclude_viewed=False) -> list:
+def get_random_subscriptions_posts(user: AbstractBaseUser,
+                                   posts=None,
+                                   n=10,
+                                   exclude_viewed=False) -> SortedPostsWrapper[Post]:
     return get_random_posts(get_subscriptions_posts(user, posts), n, user=user, exclude_viewed=exclude_viewed)
 
 
 def get_random_posts(posts: QuerySet | Manager = None,
                      n=10, user: AbstractBaseUser = None,
                      exclude_viewed=True,
-                     exclude_posts_by_current_user=True) -> list:
+                     exclude_posts_by_current_user=True) -> SortedPostsWrapper[Post]:
     if exclude_viewed and not user:
         raise ValueError('impossible to exclude viewed posts without user. '
                          'Pass user to get_random_posts or set exclude_viewed to False')
@@ -68,34 +69,35 @@ def get_random_posts(posts: QuerySet | Manager = None,
     posts = sort_posts_by_relevance_with_shuffle(posts)
 
     if not posts:
-        return []
+        return SortedPostsWrapper()
     if len(posts) <= n:
         return posts
 
-    return some_shuffle_posts(posts, n)
-
-
-def some_shuffle_posts(posts, n):
     sorted_posts = []
-    cycle_n = 0
+    cycle_n = 1
     while len(sorted_posts) < n:
-        slice_end = len(posts)
-        for _ in range(len(posts) // 10 + 1):
-            slice_end = random.randint(0, slice_end)
-        slice_end = slice_end or 1
-        sliced = posts[0:slice_end]
+        end = random.randint(0, len(posts))
+        end = random.randint(0, end) or 1
+        sliced = posts[0:end]
 
-        possible_choices = sliced.copy()
-        for added_post in sorted_posts:
-            if added_post in possible_choices:
-                possible_choices.pop(possible_choices.index(added_post))
-        if not sliced:
-            continue
         post = random.choice(sliced)
         if post not in sorted_posts:
-            sorted_posts.append(post)
+            sorted_posts.append(sliced)
+
         cycle_n += 1
         if cycle_n > 1000:
-            warnings.warn('mixing algorithm iterated 1000 times, it may take too many time and memory', stacklevel=2)
+            raise OverflowError('algorithm iterated too many times')
 
-    return sorted_posts
+    return posts[:n]
+
+
+def get_additional_posts(user, n, is_subscriptions, author_pk):
+    if is_subscriptions:
+        posts = get_random_subscriptions_posts(user, n=n)
+    elif author_pk:
+        if is_subscriptions:
+            raise ValueError("author_pk and subscriptions = True can't be used together")
+        posts = Post.objects.exclude_viewed(user).filter(author_pk=author_pk)[:n]
+    else:
+        posts = get_random_posts(user=user, n=n)
+    return posts

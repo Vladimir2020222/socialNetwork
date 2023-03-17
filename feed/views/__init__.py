@@ -13,16 +13,18 @@ from feed.config import INITIAL_POSTS_COUNT
 
 def main(request):
     context = {
-        'posts': get_random_posts(user=request.user, n=INITIAL_POSTS_COUNT),
-        'is_subscriptions': False
+        'posts': (posts := get_random_posts(user=request.user, n=INITIAL_POSTS_COUNT)),
+        'is_subscriptions': False,
+        'loaded_posts_ids': [post.pk for post in posts]
     }
     return render(request, 'feed/main.html', context)
 
 
 def subscriptions(request):
     context = {
-        'posts': get_random_subscriptions_posts(request.user, n=INITIAL_POSTS_COUNT),
-        'is_subscriptions': False
+        'posts': (posts := get_random_subscriptions_posts(request.user, n=INITIAL_POSTS_COUNT)),
+        'is_subscriptions': True,
+        'loaded_posts_ids': [post.pk for post in posts]
     }
     return render(request, 'feed/main.html', context)
 

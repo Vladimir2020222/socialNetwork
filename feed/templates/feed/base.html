@@ -1,31 +1,33 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <script src="{% static 'feed/js/posts_viewing_and_loading.js' %}"></script>
+{% endblock %}
 
 {% block scripts %}
-    {{ block.super }}
     <script>
         let watched_posts = [];
-        let loaded_post_ids = [];
+        let loaded_posts_ids = {{ loaded_posts_ids|safe }};
         let additional_posts_count = null;
         let additional_posts_count_increment = 5;
+        const max_additional_posts_count = 8;
 
         try {
             page_contains_posts
-        }
-        catch (e) {
+        } catch (e) {
             page_contains_posts = false;
         }
 
         try {
             posts_from_subscriptions
-        }
-        catch (e) {
+        } catch (e) {
             posts_from_subscriptions = false;
         }
 
         try {
             page_owner_pk
-        }
-        catch (e) {
+        } catch (e) {
             page_owner_pk = null;
         }
 
@@ -43,7 +45,7 @@
 
         window.onscroll = function () {
             if (page_contains_posts && user_is_authenticated) {
-                for (let post_id of loaded_post_ids) {
+                for (let post_id of loaded_posts_ids) {
                     if (come(document.getElementById(post_id + '_post_text'))) {
                         if (!watched_posts.includes(post_id)) {
                             watched_posts.push(post_id)
@@ -54,21 +56,28 @@
             }
             if (come(document.getElementById('feed-end'))) {
                 document.getElementById('feed-end').remove()
+
                 function success(data) {
+                    let content = data['content']
+                    let post_ids = data['loaded_posts_ids']
                     additional_posts_count += additional_posts_count_increment;
-                    document.getElementById('main-content').innerHTML += data;
+                    if (additional_posts_count > max_additional_posts_count) {
+                        additional_posts_count = max_additional_posts_count
+                    }
+                    let main_content = document.getElementById('main-content');
+                    main_content.innerHTML += content;
+                    loaded_posts_ids.push(...post_ids)
                 }
+
                 let data = {};
                 if (posts_from_subscriptions) {
                     data = {'subscriptions': true}
-                }
-                else if (page_owner_pk != null) {
+                } else if (page_owner_pk != null) {
                     data = {'author_pk': page_owner_pk}
                 }
                 if (additional_posts_count != null) {
                     data['n'] = additional_posts_count
                 }
-                console.log('additional loading')
                 ajaxPOST(urls['get_additional_posts'], {
                     'data': data,
                     'success': success

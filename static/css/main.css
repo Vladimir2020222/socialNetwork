@@ -1,0 +1,101 @@
+body {
+    background-color: #111;
+    color: #ddd;
+    line-height: 1.35;
+    font-size: 14px;
+    font-weight: lighter;
+    padding: 0;
+    margin: 0;
+}
+
+#main-content {
+    margin: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0);
+    display: inline-block;
+    position: absolute;
+    width: 620px;
+    left: 30%;
+}
+
+.main-content-block {
+    padding: 25px;
+    margin: 15px 0 15px 0;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+#main-left-menu {
+    line-height: 2;
+    display: inline-block;
+    position: fixed;
+    left: 15%;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0);
+    font-size: 16px;
+}
+
+#main-left-menu ul {
+    list-style-type: none;
+    transform: translateX(-20px);
+}
+
+#main-left-menu ul li {
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 8px;
+    width: 100px;
+}
+
+#main-left-menu ul li a {
+    padding: 0 10px 0 10px;
+    text-decoration: none;
+    color: #ddd;
+    display: block;
+    width: 100px;
+}
+
+#main-left-menu ul li:hover {
+    background-color: #222;
+    border-radius: 8px;
+}
+
+.user-ava {
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    height: 50px;
+    width: 50px;
+}
+
+.user-username {
+    display: inline;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+input {
+    padding: 3px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: inherit;
+}
+
+textarea {
+    padding: 6px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: inherit;
+}
+
+select {
+    padding: 2px;
+    margin: 2px;
+    border-radius: 4px;
+    background-color: #202020;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: inherit;
+}

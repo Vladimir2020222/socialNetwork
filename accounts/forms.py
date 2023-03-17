@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm as DefaultUserCreationForm
-from django.forms import Form
 from django.utils import timezone
 
 User = get_user_model()
@@ -21,5 +20,4 @@ class UserCreationForm(DefaultUserCreationForm):
 
 
 class UpdateUserForm(forms.ModelForm):
-    class Meta(UserCreationForm.Meta):
-        pass
+    pass

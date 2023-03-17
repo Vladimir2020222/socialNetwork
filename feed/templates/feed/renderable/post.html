@@ -14,7 +14,7 @@
             {{ post.text }}
         {% else %}
             <span onclick="hide_or_show_post_text({{ post.pk }})">
-                        {{ post.text|slice:':1000' }}<span id="{{ post.pk }}_text_ellipsis">...</span><span
+                        {{ post.text|slice:':1000' }}<span style="color: #4d6dde" id="{{ post.pk }}_text_ellipsis"> читать дальше...</span><span
                     id="{{ post.pk }}_hidden_text" hidden>{{ post.text|slice:'1000:' }}</span>
                     </span>
         {% endif %}
@@ -38,7 +38,7 @@
     <div class="post-statistics">
         views: {{ post.viewers__count|add:1 }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         likes: <input class="like-counter" id="{{ post.pk }}_like_input" type="text"
-                      value="{{ post.likes.count }}" readonly>
+                      value="{{ post.likes__count }}" readonly>
         <div style="padding: 15px; display: inline-block" onclick="like_post({{ post.pk }})">
             <img id="{{ post.pk }}_like_button" src="{% if post|has_liked_by:user %}
                         {% static 'feed/img/active_like.png' %}
@@ -48,7 +48,7 @@
         </div>
 
         dislikes: <input class="like-counter" id="{{ post.pk }}_dislike_input" type="text"
-                         value="{{ post.dislikes.count }}" readonly>
+                         value="{{ post.dislikes__count }}" readonly>
         <div style="padding: 15px; display: inline-block" onclick="dislike_post({{ post.pk }})">
             <img id="{{ post.pk }}_dislike_button" src="{% if post|has_disliked_by:user %}
                             {% static 'feed/img/active_dislike.png' %}
@@ -77,8 +77,4 @@
     {% if post.author == user or perms.feed.delete_post %}
         <a href="{% url 'post_update' post.pk %}">change</a>
     {% endif %}
-    <script>
-        console.log({{ post.pk }}, 'is loaded')
-        loaded_post_ids.push({{ post.pk }})
-    </script>
 </div>
